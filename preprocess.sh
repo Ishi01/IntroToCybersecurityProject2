@@ -25,9 +25,12 @@ awk -F '\t' '{print $1"\t"$2"\t"$3"\t"$4"\t"$5}' $filename > temp.tsv
 
 #Extracting month info
 #Print the column with dates, cut off everything after the first /, remove leading zeroes and save to temporary file
-awk -F '\t' 'BEGIN{print "Month"} NR>1 { print $4 }' $filename | cut -f1 -d'/' | sed 's/^0*//' > temp2.tsv
+awk -F '\t' 'BEGIN{print "Month"} NR>1 { print $4 }' $filename | cut -f1 -d'/' | sed 's/^0*//' > monthsTemp.tsv
 
 #Extract year info
+awk -F '\t' 'BEGIN{print "Year"} NR>1 { print $4 }' $filename | cut -f1 -d'-' | sed 's/.*\///' > yearsTemp.tsv
+
+
 
 #append month data file with the overall data file using paste
-paste temp.tsv temp2.tsv > temp3.tsv
+paste temp.tsv monthsTemp.tsv > temp3.tsv
