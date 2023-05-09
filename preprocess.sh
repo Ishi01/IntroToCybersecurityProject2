@@ -28,8 +28,37 @@ awk -F '\t' '{print $1"\t"$2"\t"$3"\t"$4"\t"$5}' $filename > temp.tsv
 awk -F '\t' 'BEGIN{print "Month"} NR>1 { print $4 }' $filename | cut -f1 -d'/' | sed 's/^0*//' > monthsTemp.tsv
 
 #Extract year info (leading zeroes not kept)
-awk -F '\t' 'BEGIN{print "Year"} NR>1 { print $4 }' $filename | cut -f1 -d'-' | sed 's/.*\///' > yearsTemp.tsv
+awk -F '\t' 'BEGIN{print "Year"} NR>1 { print $4 }' $filename | cut -f1 -d'-' | sed 's/.*\///' > yearsTemp1.tsv
 
+#read contents of yearsTemp into array to be iterated over
+readarray -t year_array < yearsTemp1.tsv
+
+#Iterate over each item
+index=0
+for i in "${!year_array[@]}";
+do
+	#declare value as num in current index
+	value=${year_array[$i]}
+	#Remove extra spaces from the values
+	year_array[i]="${value// /}"
+	
+	#Check if value is 2 characters long
+	iLength="${#value}"
+	if [ "$iLength" -eq 2 ]
+	then
+		#Check if value is from before or after 2000, if it's before, add 19 to front, else add 20
+		#Use 10# to force bash to read them as decimal even through the leading zeroes
+		if (("10#$value" >= 25 && "10#$value" <=99));
+		then
+			year_array[i]="19$value"
+		else
+			year_array[i]="20$value"
+		fi
+	fi
+done
+
+#Read edited year_array array back into the temp file
+printf "%s\n" "${year_array[@]}" > yearsTemp2.tsv
 
 
 #append month data file with the overall data file using paste
