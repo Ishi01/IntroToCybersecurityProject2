@@ -27,7 +27,7 @@ awk -F '\t' '{print $1"\t"$2"\t"$3"\t"$4"\t"$5}' $filename > temp.tsv
 #Print the column with dates, cut off everything after the first /, remove leading zeroes and save to temporary file
 awk -F '\t' 'BEGIN{print "Month"} NR>1 { print $4 }' $filename | cut -f1 -d'/' | sed 's/^0*//' > monthsTemp.tsv
 
-#Extract year info
+#Extract year info (leading zeroes not kept)
 awk -F '\t' 'BEGIN{print "Year"} NR>1 { print $4 }' $filename | cut -f1 -d'-' | sed 's/.*\///' > yearsTemp.tsv
 
 
