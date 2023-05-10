@@ -28,6 +28,7 @@ then
 	exit 1
 fi
 
+#add error checking for data format in columns
 
 
 
