@@ -6,10 +6,5 @@ filename=$1
 
 #ADD ERROR CHECKING LATER
 
-#Create month name and count arrays
-awk -F '\t' 'NR>1 {print $6}' $filename > monthsTemp.tsv
-awk -F '\t' 'NR>1 {print $3}' $filename > countTemp.tsv
-
-#read those values into arrays to be iterated over
-readarray -t months_array < monthsTemp.tsv
-readarray -t count_array < countTemp.tsv
+#Print the month for every single incident, sort them and compress the duplicates to get a total count for each month
+awk -F '\t' 'NR>1 {print $6}' $filename | sort | uniq -c > total_and_months_temp.tsv
