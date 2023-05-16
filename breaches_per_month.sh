@@ -4,15 +4,12 @@
 
 filename=$1
 
-#ADD ERROR CHECKING LATER
-
 #Print the month for every single incident, sort them and compress the duplicates to get a total count for each month, then save to file
 awk -F '\t' 'NR>1 {print $6}' $filename | sort | uniq -c | awk '{print $2"\t"$1}' > months_total_temp.tsv
 
 #Sort the file by total number of incidents
 sort -t$'\t' -k2 -n months_total_temp.tsv > months_total_temp2.tsv
-#Remove extra temp file
-rm months_total_temp.tsv
+
 #read out totals into variable
 total_array=($(awk '{print $2}' months_total_temp2.tsv))
 
@@ -41,14 +38,14 @@ do
     echo ${abs_dev_val#-}
 done > abs_val_temp.tsv
 
+#sort absolute value file and save to array so it can be operated on
 sorted_abs_val_array=($(awk -F '\t' '{print $1}' abs_val_temp.tsv | sort -n))
+#remove unused temp file
 rm abs_val_temp.tsv
-
-echo "${sorted_abs_val_array[@]}"
 
 #Find middle value, and make sure it can regardless of odd or even number of val
 abs_array_length=${#sorted_abs_val_array[*]}
-echo $abs_array_length
+#Check if array length is even
 if [ $(($abs_array_length%2)) -eq 0 ];
 then
     #find the entry in the middle of the array if amount is even
@@ -59,5 +56,33 @@ else
     middle_abs_entry=$((($abs_array_length + 1) / 2))
     median_abs_deviation=${sorted_abs_val_array[middle_abs_entry]}
 fi
+#Print values
+echo "Median = "$median
+echo "Median Absolute Deviation = "$median_abs_deviation
 
-echo $median_abs_deviation
+#Print out the table of values
+
+#sort values by month
+sort -t$'\t' -k1 -n months_total_temp.tsv > months_total_sorted.tsv
+
+while read op_row; do
+    #Extract the month and number of incidents from the row input from file
+    month_num=$( echo $op_row | cut -d " " -f1)
+    incidents_num=$(echo $op_row  | cut -d " " -f2)
+
+    #Calculate whether the incidents are one standard deviation off of the MAD
+    #check if incidents num is greater than or equal to median + 1 MAD
+    change_char=""
+    if [ $incidents_num -ge "$(($median+$median_abs_deviation))" ]
+    then
+        change_char="++"
+    fi
+    #check if incidents num is less than or equal to median - 1 MAD
+    if [ $incidents_num -le "$(($median-$median_abs_deviation))" ]
+    then
+        change_char="--"
+    fi
+
+
+
+done <months_total_sorted.tsv
