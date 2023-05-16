@@ -65,7 +65,8 @@ echo "Median Absolute Deviation = "$median_abs_deviation
 #sort values by month
 sort -t$'\t' -k1 -n months_total_temp.tsv > months_total_sorted.tsv
 
-while read op_row; do
+while read -r op_row
+do
     #Extract the month and number of incidents from the row input from file
     month_num=$( echo $op_row | cut -d " " -f1)
     incidents_num=$(echo $op_row  | cut -d " " -f2)
@@ -83,6 +84,53 @@ while read op_row; do
         change_char="--"
     fi
 
+    #Determine the month string based on num value from file
+    #(I am doing this using case to prevent erros from input files that do not have incidents for each month)
+    case $month_num in
+        1)
+        month_txt="Jan"
+        ;;
+        2)
+        month_txt="Feb"
+        ;;
+        3)
+        month_txt="Mar"
+        ;;
+        4)
+        month_txt="Apr"
+        ;;
+        5)
+        month_txt="May"
+        ;;
+        6)
+        month_txt="Jun"
+        ;;
+        7)
+        month_txt="Jul"
+        ;;
+        8)
+        month_txt="Aug"
+        ;;
+        9)
+        month_txt="Sep"
+        ;;
+        10)
+        month_txt="Oct"
+        ;;
+        11)
+        month_txt="Nov"
+        ;;
+        12)
+        month_txt="Dec"
+        ;;
+    esac
 
+    #print output string
+    printf "%s\t%s\t%s\n" "$month_txt" "$incidents_num" "$change_char"
+done < months_total_sorted.tsv
 
-done <months_total_sorted.tsv
+#remove used temp files
+rm months_total_sorted.tsv
+rm months_total_temp.tsv
+rm months_total_temp2.tsv
+rm abs_med_val.tsv
