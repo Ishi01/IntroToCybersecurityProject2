@@ -78,8 +78,8 @@ done
 printf "%s\n" "${year_array[@]}" > yearsTemp2.tsv
 
 
-#append month data file with the overall data file using paste
-paste temp.tsv typeOfBreachTemp.tsv monthsTemp.tsv yearsTemp2.tsv > Cyber_Security_Breaches_clean.tsv
+#append month data file with the overall data file using paste, and print to console
+paste temp.tsv typeOfBreachTemp.tsv monthsTemp.tsv yearsTemp2.tsv 
 
 #remove all of the temp files
 rm temp.tsv
